@@ -6,16 +6,16 @@
 ========================
 
 	Partially ported VehicleAPI from ADM
+	https://twhl.info/thread/view/19672?page=1
 
 	This code is uncomplete as it's partially ported from
 	Advanced Development Mod :: VehicleAPI. 
-	For example, VehicleEngine and VehicleWheel structs are absent.
-	More of it is managed inside the entity class itself, as this
-	mod only requires a boat and a motorbike. 
+	For example, VehicleEngine and VehicleWheel structs are missing.
+	More of the vehicle functionality is managed inside the entity 
+	class itself, as this mod only requires a boat and a motorbike. 
 
 	For a more complete copy of the code, contact
 	Admer456#2798 on Discord.
-
 */
 
 //#include "vehicles/CVehicleBase_Types.h"

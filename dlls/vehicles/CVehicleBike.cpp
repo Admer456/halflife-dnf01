@@ -39,7 +39,7 @@ void CVehicleBike::VehicleMove( void )
 
 	if ( v_Seat.iCommands & fVehKey_Forward || v_Seat.iCommands & fVehKey_Backward )
 	{
-		pev->velocity.z += 0.1;
+		pev->velocity.z += 0.1; // The vehicle is constantly above ground by 0.1 units, otherwise it's too much friction on the ground
 	}
 
 	// Braking
@@ -132,7 +132,7 @@ void CVehicleBike::VehicleMove( void )
 	SetBoneController( 1, wheelAngle );
 
 	// Sound management
-	// TO-DO: Move to another function
+	// TO-DO: Move to another function and have different sounds for different speeds
 	if ( v_Seat.iCommands & fVehKey_Forward )
 	{
 		if ( !isRevving )

@@ -174,7 +174,6 @@ void CBaseVehicle::VehicleMove( void )
 	pev->angles.x *= -1;
 	UTIL_MakeAimVectors( pev->angles );
 	pev->angles.x *= -1;
-//	pev->friction = 0.02; // friction gets reset every think, set it always
 	
 	if ( v_Type != VehicleBoat )
 	{
@@ -276,8 +275,8 @@ void VehicleSeat::Exit()
 		return;
 
 	FlushSeatCommands();
-	pSessilis->pev->origin.z += 64;				// YEET!
-	pSessilis->pev->movetype = MOVETYPE_WALK;
+	pSessilis->pev->origin.z += 64;				// YEET! Throw the player out of the seat
+	pSessilis->pev->movetype = MOVETYPE_WALK;	// TO-DO: algorithm to figure out the most optimal exit position
 	pSessilis->pev->solid = SOLID_BBOX;
 	pSessilis->m_InVehicle = InWalking;
 
@@ -354,6 +353,7 @@ void UTIL_Deg2Rad( float &in )
 	in *= M_PI / 180;
 }
 
+// Not actually used, can cause bugs
 Vector AlignToGround( Vector origin, Vector dirangles, float radius, edict_t *pentIgnore )
 {
 	TraceResult trDown;
