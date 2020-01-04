@@ -1,3 +1,23 @@
+Mod title: "Di** Kickem Fornow 2001"
+
+Status: cancelled
+
+Considering the mod is now cancelled, I decided to release the latest version of the source code. The code comes from multiple programmers, being based on Solokiller's Opposing Force SDK (who wasn't involved in this project himself), with additions by at least 3 programmers (including Admer (me), Rara and one unknown individual) in different time periods. The original author, who was the level designer, GuyOnAChair, had cancelled the project circa December 2019 due to a different, more important project. The final additions were by me, mainly regarding the vehicle code.
+
+In this repository, you'll find code for the following (but not limited to):
+
+- vehicle_bike entity;
+- vehicle_boat entity;
+- DN3D-style kicking which renders a secondary viewmodel simultaneously with the primary viewmodel;
+- player monologue system which is context-dependent (different lines for getting hurt, for attacking, kicking, idling etc.);
+- bullet projectiles for almost all weapons, which are able to penetrate through func_breakables that have a certain flag set;
+- citizen NPCs;
+- trigger_noweaponpoint and trigger_nowepaonzone, which holster the player's weapon when triggered;
+- and so on.
+
+I hope that whoever comes across this source code will find it useful for their projects.
+-Admer
+
 Half Life 1 SDK LICENSE
 ======================
 
