@@ -34,7 +34,9 @@ void DLLEXPORT HUD_DrawNormalTriangles( void )
 //	RecClDrawNormalTriangles();
 	// RENDER LEGS HERE
 	gHUD.m_Kick.m_Leg.InitLeg();
-	gHUD.m_Kick.m_Leg.UpdateLeg();
+
+	if ( gHUD.m_Kick.m_Leg.m_fShouldRender )
+		gHUD.m_Kick.m_Leg.UpdateLeg();
 
 	gHUD.m_Spectator.DrawOverview();
 }

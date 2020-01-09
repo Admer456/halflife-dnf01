@@ -38,8 +38,11 @@ float g_LegViewPunch;
 
 int CKickLeg::InitLeg(void)
 {
-	entLeg.model = IES.Mod_ForName("models/v_kick.mdl", 0); // this model is absolutely needed
-	
+	if ( !m_fLoaded )
+	{
+		entLeg.model = IES.Mod_ForName( "models/v_kick.mdl", 0 ); // this model is absolutely needed
+	}
+
 	return 1;
 }
 
@@ -48,20 +51,30 @@ void CKickLeg::Kick(void)
 	entLeg.curstate.animtime = gEngfuncs.GetClientTime();
 	entLeg.curstate.sequence = LEG_KICK;
 
+	m_fShouldRender = true;
 	m_flToIdle = gEngfuncs.GetClientTime() + 0.55;
 }
+
+#define DEG2RAD (M_PI / 180.0)
 
 // Original method from PARANOIA by buzer
 // They implemented this method directly into the StudioModelRenderer
 // instead of this separate class.
 // TL;DR this way allows for a cleaner integration with the HUD.
 // In hud.h I defined a CHudKick class which contains a CKickLeg,
-// so it can be easily called and whatnot - instead of using global vars D:
+// so it can be easily called and whatnot - instead of using too many global vars D:
 
 int CKickLeg::UpdateLeg(void)
 {
 	alight_t m_Lighting;
 	vec3_t m_vecDir;
+	Vector camUp, camRt, camFt;
+
+	g_vecViewAngles.x = -g_vecViewAngles.x;
+
+	AngleVectors( g_vecViewAngles, camFt, camRt, camUp );
+
+	g_vecViewOrigin = g_vecViewOrigin + camUp * 30.0 + camFt * 30.0;
 
 	// update position
 	VectorCopy(g_vecViewOrigin, entLeg.origin);
@@ -69,11 +82,7 @@ int CKickLeg::UpdateLeg(void)
 	VectorCopy(g_vecViewAngles, entLeg.angles);
 	VectorCopy(g_vecViewAngles, entLeg.curstate.angles);
 
-/*	gEngfuncs.Con_Printf("\norg: %i\t%i\t%i",
-		(int)entLeg.curstate.origin.x,
-		(int)entLeg.curstate.origin.y,
-		(int)entLeg.curstate.origin.z
-	); */
+	g_vecViewAngles.x = -g_vecViewAngles.x;
 
 	gSR.m_pCurrentEntity = &entLeg;
 
@@ -412,9 +421,18 @@ void CHudKick::Think(void)
 {
 	float flCurtime = gEngfuncs.GetClientTime();
 
-	if (flCurtime > m_Leg.m_flToIdle &&
-		m_Leg.entLeg.curstate.sequence != LEG_IDLE)
+	if ( flCurtime > m_Leg.m_flToIdle &&
+		 m_Leg.entLeg.curstate.sequence != LEG_IDLE )
+	{
+		m_Leg.m_fShouldRender = false;
 		m_Leg.entLeg.curstate.sequence = LEG_IDLE;
+	}
+
+	gEngfuncs.Con_Printf( "\norg: %i\t%i\t%i",
+		(int)m_Leg.entLeg.angles.x,
+		(int)m_Leg.entLeg.angles.y,
+		(int)m_Leg.entLeg.angles.z
+	);
 }
 
 int CHudKick::MsgFunc_Kick(const char *pszName, int iSize, void *pbuf)

@@ -843,10 +843,11 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 		VectorCopy(pparams->vieworg, g_vecViewOrigin);
 		VectorCopy(pparams->viewangles, g_vecViewAngles);
 
-		g_vecViewAngles.x = 0;
-		g_vecViewAngles.z = 0;
+		//g_vecViewAngles.x *= -1;
+		//g_vecViewAngles.x = 0;
+		//g_vecViewAngles.z = 0;
 
-//		g_vecViewOrigin = g_vecViewOrigin + (camForward * 32);
+		//g_vecViewOrigin = g_vecViewOrigin + (camForward * 32);
 	}
 
 	// override all previous settings if the viewent isn't the client

@@ -962,13 +962,13 @@ void CTentacle :: HitTouch( CBaseEntity *pOther )
 
 	if (tr.iHitgroup >= 3)
 	{
-		pOther->TakeDamage( pev, pev, m_iHitDmg, DMG_CRUSH );
-		// ALERT( at_console, "wack %3d : ", m_iHitDmg );
+	//	pOther->TakeDamage( pev, pev, m_iHitDmg, DMG_CRUSH );
+		ALERT( at_console, "wack %3d : ", m_iHitDmg );
 	}
 	else if (tr.iHitgroup != 0)
 	{
-		pOther->TakeDamage( pev, pev, 20, DMG_CRUSH );
-		// ALERT( at_console, "tap  %3d : ", 20 );
+	//	pOther->TakeDamage( pev, pev, 20, DMG_CRUSH );
+		ALERT( at_console, "tap  %3d : ", 20 );
 	}
 	else
 	{

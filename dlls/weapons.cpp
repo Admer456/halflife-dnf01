@@ -1640,3 +1640,8 @@ TYPEDESCRIPTION	CSatchel::m_SaveData[] =
 };
 IMPLEMENT_SAVERESTORE( CSatchel, CBasePlayerWeapon );
 
+TYPEDESCRIPTION CMP5::m_SaveData[] =
+{
+	DEFINE_FIELD( CMP5, m_fGrenadeLoaded, FIELD_INTEGER )
+};
+IMPLEMENT_SAVERESTORE( CMP5, CBasePlayerWeapon );

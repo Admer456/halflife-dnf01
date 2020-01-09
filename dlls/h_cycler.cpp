@@ -246,7 +246,6 @@ TYPEDESCRIPTION	CCyclerSprite::m_SaveData[] =
 
 IMPLEMENT_SAVERESTORE( CCyclerSprite, CBaseEntity );
 
-
 void CCyclerSprite::Spawn( void )
 {
 	pev->solid			= SOLID_SLIDEBOX;

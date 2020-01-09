@@ -2065,7 +2065,7 @@ void CStudioModelRenderer::StudioRenderFinal_Hardware( void )
 	{
 		IEngineStudio.StudioDrawHulls();
 	}
-	else
+	else //if ( m_pCvarDrawEntities->value == 6 )
 	{
 		for (i=0 ; i < m_pStudioHeader->numbodyparts ; i++)
 		{
@@ -2088,6 +2088,11 @@ void CStudioModelRenderer::StudioRenderFinal_Hardware( void )
 		gEngfuncs.pTriAPI->RenderMode( kRenderTransAdd );
 		IEngineStudio.StudioDrawHulls( );
 		gEngfuncs.pTriAPI->RenderMode( kRenderNormal );
+	}
+
+	else if ( m_pCvarDrawEntities->value == 5 )
+	{
+		IEngineStudio.StudioDrawAbsBBox();
 	}
 
 	IEngineStudio.RestoreRenderer();

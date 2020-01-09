@@ -18,6 +18,8 @@ public:
 	void Shake(float value);
 
 	float m_flToIdle = 0;
+	bool m_fLoaded = false;
+	bool m_fShouldRender = false;
 
 //	int MsgFunc_KickLeg(const char *pszName, int iSize, void *pbuf);
 };

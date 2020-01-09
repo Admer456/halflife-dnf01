@@ -23,6 +23,9 @@ void CVehicleBoat::VehicleInit( void )
 
 void CVehicleBoat::VehicleMove( void )
 {
+	UTIL_SetSize( pev, Vector( 0, 0, -48 ), Vector( 320, 384, 48 ) );
+	pev->friction = 0.025;
+
 	CBaseVehicle::VehicleMove();
 	
 	static float cyclePitch = 0.0f;
@@ -65,13 +68,21 @@ void CVehicleBoat::VehicleMove( void )
 	if ( cycleRoll > 1.0f || cycleRoll < -1.0f )
 		cycleRollIterator *= -1;
 
-	if ( floatingCycle > 1.0f || floatingCycle < -1.0f )
+	if ( floatingCycle > 1.2f || floatingCycle < -1.0f )
 		floatingCycleIterator *= -1;
 
 	// Make it go up'n'down
 	if ( pev->waterlevel )
 	{
-		pev->velocity.z += floatingCycle * 6 + 2;
+		pev->velocity.z += floatingCycle * 4 + 8;
+		pev->velocity.x /= 1.015;
+		pev->velocity.y /= 1.015;
+	}
+	else if ( !(pev->flags & FL_ONGROUND) )
+	{
+		pev->velocity.z -= 4.0;
+		pev->velocity.x /= 1.01;
+		pev->velocity.y /= 1.01;
 	}
 
 	// Rock the boat
@@ -94,7 +105,7 @@ void CVehicleBoat::VehicleMove( void )
 	steerYawTarget = steerYawTarget * 0.7 + (float)steerYawDir * 0.3;
 
 	if ( speed < 200 )
-		pev->angles.y += steerYawTarget * (speed * 0.005);
+		pev->angles.y += steerYawTarget * (speed * 0.015);
 	else if ( speed > 100 )
 		pev->angles.y += steerYawTarget * 1;
 
@@ -102,4 +113,3 @@ void CVehicleBoat::VehicleMove( void )
 	
 	// TO-DO: update the bone controller for the steering wheel
 }
-

@@ -13,6 +13,14 @@ class CVehicleBike : public CBaseVehicle
 public:
 	void VehicleInit( void );
 	void VehicleMove( void );
+
+	void SetObjectCollisionBox( void )
+	{
+		pev->absmin = pev->origin + Vector( -100, -100, 0 );
+		pev->absmax = pev->origin + Vector( 100, 100, 200 );
+
+		ALERT( at_console, "SetObjectCollisionBox %3.2f\n", gpGlobals->time );
+	}
 };
 
 LINK_ENTITY_TO_CLASS( vehicle_bike, CVehicleBike );
@@ -39,7 +47,7 @@ void CVehicleBike::VehicleMove( void )
 
 	if ( v_Seat.iCommands & fVehKey_Forward || v_Seat.iCommands & fVehKey_Backward )
 	{
-		pev->velocity.z += 0.1; // The vehicle is constantly above ground by 0.1 units, otherwise it's too much friction on the ground
+		pev->velocity.z += 0.2; // The vehicle is constantly above ground by 0.1 units, otherwise it's too much friction on the ground
 	}
 
 	// Braking

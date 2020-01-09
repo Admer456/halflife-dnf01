@@ -14,29 +14,30 @@ LINK_ENTITY_TO_CLASS( vehicle_base, CBaseVehicle );
 
 void CBaseVehicle::Spawn( void )
 {
-//	SET_MODEL( ENT( pev ), (char*)STRING( pev->model ) );
+	pev->solid		= SOLID_BBOX;
+	pev->movetype	= MOVETYPE_PUSHSTEP;
+	UTIL_SetSize( pev, Vector( -96, -96, 0 ), Vector( 96, 96, 64 ) );
 
-	SetThink( NULL );
-
-	pev->movetype = MOVETYPE_PUSHSTEP;
-	pev->solid = SOLID_BBOX;
-	pev->friction = 0.01;
-	pev->v_angle = pev->angles;
+	pev->effects	= 0;
+	pev->friction	= 0.01;
+	pev->sequence	= 0;
 
 	VehicleInit(); // all the basic stuff goes here - wheels, engine, seats, weapons, sounds to use
 	Precache(); // here we precache that stuff
-	
-	SET_MODEL( ENT( pev ), STRING( pev->model ) );
-	UTIL_SetSize( pev, Vector( -64, -64, 0 ), Vector( 64, 64, 64 ) );
 
-	VehicleBaseInit(); // and here we apply the model, hence I had to precache between Init and BaseInit
+	SET_MODEL( ENT( pev ), STRING( pev->model ) );
+
+	pev->takedamage = DAMAGE_YES;
 
 	SetUse( &CBaseVehicle::VehicleEnterUse );
 	SetThink( &CBaseVehicle::VehicleThink );
+	SetTouch( &CBaseVehicle::VehicleTouch );
+
+	VehicleBaseInit(); // and here we apply the model, hence I had to precache between Init and BaseInit
 
 	UTIL_SetOrigin( pev, pev->origin );
 
-	pev->nextthink = 1.5; // They said this is a magic number. :o
+	pev->nextthink = gpGlobals->time + 0.1; // They said this is a magic number. :o
 }
 
 void CBaseVehicle::Precache( void )
@@ -56,10 +57,6 @@ void CBaseVehicle::KeyValue( KeyValueData * pkvd )
 		m_iSeatBoneOffset = atoi( pkvd->szValue );
 		pkvd->fHandled = TRUE;
 	}
-//	else if ( FStrEq( pkvd->szKeyName, "unused" ) )
-//	{
-//		pkvd->fHandled = TRUE;
-//	}
 	else
 	{
 		CBaseEntity::KeyValue( pkvd );
@@ -142,24 +139,45 @@ void CBaseVehicle::VehicleExit( void )
 
 void CBaseVehicle::VehicleThink( void )
 {
-//	SeatPlayerLocking();
-//	SeatPositionLocking();
-//	ListenToCommands();
-//	VehicleMovement();
-
 	v_Seat.AttachToPos( *this, m_iSeatBoneOffset );
 	v_Seat.SeatPlayer();
 	v_Seat.ListenToCommands();
 
-	if ( v_Seat.iCommands & fVehKey_Use && v_Seat.iCommands & fVehKey_Combokey )
+	// Listen to very basic commands for all seats and execute them
+	if ( v_Seat.iCommands & fVehKey_Use && 
+		 v_Seat.iCommands & fVehKey_Combokey )
 		VehicleExit();
 
+	// Trick the player into thinking he's on the ground
 	if ( v_Seat.pSessilis )
-		v_Seat.pSessilis->pev->flags &= FL_ONGROUND;
+		v_Seat.pSessilis->pev->flags |= FL_ONGROUND;
+
+	// This forms a 128x128x96 box around the vehicle, but offset diagonally a little bit
+	// I don't know why the bounding box gets offset from the vehicle, must be an engine thing
+	// Until we figure out how to do this automatically, each vehicle class should define a custom 
+	// AABB via UTIL_SetSize() in its Think function
+	// Also, calling UTIL_SetSize periodically is mandatory for complex collision via hitboxes
+	UTIL_SetSize( pev, Vector( -32, -32, 0 ), Vector( 96, 96, 96 ) );
 
 	VehicleMove();
-	
+
+	// Dunno if SetOrigin is required at this point - certainly breaks MOVETYPE_FLY
+	UTIL_SetOrigin( pev, pev->origin );
 	pev->nextthink = gpGlobals->time + 0.01;
+}
+
+void CBaseVehicle::VehicleTouch( CBaseEntity *pOther )
+{
+	ALERT( at_console, "CBaseVehicle::VehicleTouch()\n" );
+
+	// bounce if we hit something solid
+	if ( pOther->pev->solid == SOLID_BSP )
+	{
+		TraceResult tr = UTIL_GetGlobalTrace();
+
+		// UNDONE, do a real bounce
+		pev->velocity = pev->velocity + tr.vecPlaneNormal * (pev->velocity.Length() + 200);
+	}
 }
 
 void CBaseVehicle::VehicleMove( void )
@@ -184,10 +202,10 @@ void CBaseVehicle::VehicleMove( void )
 	}
 	else
 	{
-		if ( !(pev->flags & FL_ONGROUND) )
+		//if ( !(pev->flags & FL_ONGROUND) )
 			pev->velocity = pev->velocity + (gpGlobals->v_forward * flAccelerate);
-		else
-			pev->velocity = pev->velocity;
+		//else
+			pev->velocity = pev->velocity + Vector( 0, 0, 0.1 );
 	}
 
 }
@@ -275,22 +293,22 @@ void VehicleSeat::Exit()
 		return;
 
 	FlushSeatCommands();
-	pSessilis->pev->origin.z += 64;				// YEET! Throw the player out of the seat
-	pSessilis->pev->movetype = MOVETYPE_WALK;	// TO-DO: algorithm to figure out the most optimal exit position
-	pSessilis->pev->solid = SOLID_BBOX;
-	pSessilis->m_InVehicle = InWalking;
+	pSessilis->pev->origin.z	+= 64;				// YEET! Throw the player out of the seat
+	pSessilis->pev->movetype	= MOVETYPE_WALK;	// TO-DO: algorithm to figure out the most optimal exit position
+	pSessilis->pev->solid		= SOLID_BBOX;
+	pSessilis->m_InVehicle		= InWalking;
 
-	pSessilis = nullptr;
+	pSessilis					= nullptr;
 }
 
 void VehicleSeat::Init( VehicleSeatType intype, vec3_t inpos, int sitdex )
 {
-	type = intype;
-	fExists = true;
-	pSessilis = nullptr;
-	pos = inpos;
-	pos.z -= 48;
-	iSitdex = sitdex;
+	type		= intype;
+	fExists		= true;
+	pSessilis	= nullptr;
+	pos			= inpos;
+	pos.z		-= 48;
+	iSitdex		= sitdex;
 
 	FlushSeatCommands();
 }
@@ -301,14 +319,11 @@ void VehicleSeat::AttachToPos( CBaseVehicle &Vehicle, int iBoneOffset )
 
 	auto v_Type = Vehicle.GetVehType();
 
-//	if ( iBone )
-//	{
-		GetBoneId( iBone, v_Type );
-		GET_BONE_POSITION( ENT( Vehicle.pev ), iBone, pos, angles );
-//	}
+	GetBoneId( iBone, v_Type );
+	GET_BONE_POSITION( ENT( Vehicle.pev ), iBone, pos, angles );
 
 	#ifdef DEBUG
-	ALERT( at_console, "\nAttachToPos::iBone = %d", iBone );
+	ALERT( at_aiconsole, "\nAttachToPos::iBone = %d", iBone );
 	#endif
 }
 

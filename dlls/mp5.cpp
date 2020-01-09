@@ -47,11 +47,6 @@ LINK_ENTITY_TO_CLASS( weapon_9mmAR, CMP5 );
 //=========================================================\\
 //=========================================================\\
 
-TYPEDESCRIPTION CMP5::m_SaveData[] =
-{
-	DEFINE_FIELD(CMP5, m_fGrenadeLoaded, FIELD_INTEGER)
-};
-
 int CMP5::SecondaryAmmoIndex( void )
 {
 	return m_iSecondaryAmmoType;
@@ -71,7 +66,6 @@ void CMP5::Spawn( )
 
 	FallInit();// get ready to fall down.
 }
-
 
 void CMP5::Precache( void )
 {
@@ -352,27 +346,27 @@ void CMP5::WeaponIdle( void )
 	m_flTimeWeaponIdle = UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10, 15 ); // how long till we do this again.
 }
 
-int CMP5::Save(CSave &save)
-{
-	if (!CBasePlayerWeapon::Save(save))
-		return 0;
-#ifndef CLIENT_DLL
-	return save.WriteFields("CMP5", this, m_SaveData, ARRAYSIZE(m_SaveData));
-#else
-	return 1;
-#endif 
-}
-
-int CMP5::Restore(CRestore &restore)
-{
-	if (!CBasePlayerWeapon::Restore(restore))
-		return 0;
-#ifndef CLIENT_DLL
-	return restore.ReadFields("CMP5", this, m_SaveData, ARRAYSIZE(m_SaveData));
-#else
-	return 1;
-#endif
-}
+//int CMP5::Save(CSave &save)
+//{
+//	if (!CBasePlayerWeapon::Save(save))
+//		return 0;
+//#ifndef CLIENT_DLL
+//	return save.WriteFields("CMP5", this, m_SaveData, ARRAYSIZE(m_SaveData));
+//#else
+//	return 1;
+//#endif 
+//}
+//
+//int CMP5::Restore(CRestore &restore)
+//{
+//	if (!CBasePlayerWeapon::Restore(restore))
+//		return 0;
+//#ifndef CLIENT_DLL
+//	return restore.ReadFields("CMP5", this, m_SaveData, ARRAYSIZE(m_SaveData));
+//#else
+//	return 1;
+//#endif
+//}
 
 class CMP5AmmoClip : public CBasePlayerAmmo
 {
